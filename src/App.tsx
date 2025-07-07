@@ -58,7 +58,7 @@ function App() {
           <img src={logo} className="w-48 md:w-56" alt="StudyAuckland logo" />
         </div>
         <div className="grid w-full gap-3">
-          <Label htmlFor="message">SpotSearcher</Label>
+          <Label htmlFor="message">Searcher</Label>
           <Textarea
             className="resize-none"
             placeholder="Search here if you have a specific cafe or keyword in mind"
