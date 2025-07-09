@@ -57,12 +57,12 @@ export function VibeSpotCard({
                   className="text-xs px-2 py-1"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? wifiPassword : "Show WiFi Password"}
+                  {showPassword ? wifiPassword : "WiFi info"}
                 </Button>
               </div>
             )}
 
-            <CardTitle className="text-base font-semibold text-foreground">
+            <CardTitle className="flex text-base font-semibold text-foreground">
               {title}
             </CardTitle>
             <CardDescription>{description}</CardDescription>

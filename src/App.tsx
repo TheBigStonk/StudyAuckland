@@ -18,46 +18,49 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import mapStyle from "./style/MapStyle";
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import mapStyle from "./style/MapStyle"
 
 function App() {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const center = { lat: -36.856, lng: 174.762 };
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const center = { lat: -36.856, lng: 174.762 }
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
+  })
 
   function handleTagToggle(tag: string) {
     setSelectedTags((prev) =>
       prev.includes(tag)
         ? prev.filter((t) => t !== tag)
         : [...prev, tag]
-    );
+    )
   }
 
   const filteredSpots = spots.filter((spot) => {
     const matchesTags =
-      selectedTags.length === 0 || selectedTags.every(tag => spot.tags.includes(tag));
+      selectedTags.length === 0 || selectedTags.every(tag => spot.tags.includes(tag))
 
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase()
     const matchesSearch =
       spot.title.toLowerCase().includes(query) ||
-      spot.description.toLowerCase().includes(query);
+      spot.description.toLowerCase().includes(query)
 
-    return matchesTags && matchesSearch;
-  });
+    return matchesTags && matchesSearch
+  })
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-full md:w-2/5 p-4 space-y-6 overflow-y-auto">
-        <div className="flex flex-col items-start space-y-2">
-          <img src={logo} className="w-48 md:w-56" alt="StudyAuckland logo" />
+      {/* Sidebar / Top Controls */}
+      <div className="w-full md:w-2/5 md:h-full p-4 space-y-6 overflow-y-auto md:sticky md:top-0 bg-background z-10 min-h-[240px]">
+        {/* Logo */}
+        <div className="flex flex-col items-center md:items-start space-y-2">
+          <img src={logo} className="w-40 md:w-56" alt="StudyAuckland logo" />
         </div>
-        <div className="grid w-full gap-3">
+
+        {/* Search input (desktop only) */}
+        <div className="hidden md:grid w-full gap-3">
           <Label htmlFor="message">Searcher</Label>
           <Textarea
             className="resize-none"
@@ -66,60 +69,70 @@ function App() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className="flex flex-col gap-6">
-            <Label>Vibe Filters</Label>
-            {[
-              "Easy parking",
-              "Gluten Free",
-              "Keto",
-              "Dim",
-              "Library",
-              "Free WiFi"
-            ].map((tag, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <Checkbox
-                  id={`tag-${index}`}
-                  checked={selectedTags.includes(tag)}
-                  onCheckedChange={() => handleTagToggle(tag)}
-                />
-                <Label htmlFor={`tag-${index}`}>{tag}</Label>
-              </div>
-            ))}
-          </div>
-
-          <AlertDialog>
-            <AlertDialogTrigger className="w-full">
-              <Button className="w-full" variant="outline">
-                Take a sec to read our study manners ❤
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Manners and Advice</AlertDialogTitle>
-                <AlertDialogDescription>
-                  The purpose of StudyAuckland is to enable an informative way to explore where best to work, study, and overall be productive in the greatest city in the world!
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogDescription>
-                Make sure if you stay any meaningful amount of time somewhere, and if you're able to, <b>support commercial business by purchasing food and drinks</b>. It costs money to run them and it is necessary to be complimentary to the space.
-              </AlertDialogDescription>
-              <AlertDialogDescription>
-                There is no "my reserved space" (unless you expressly have an arrangement). Hoarding, hogging, and keeping a spot is like telling people it's your sidewalk.
-              </AlertDialogDescription>
-              <AlertDialogDescription>
-                General respect goes a long way ❤
-              </AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogAction>Got it!</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
+
+        {/* Vibe Filters (mobile only) */}
+        <div className="block md:hidden">
+          <div className="flex flex-col gap-4">
+            <Label>Vibe Filters</Label>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {[
+                "Easy parking",
+                "Gluten Free",
+                "Good food",
+                "Dim",
+                "Bright",
+                "Quiet",
+                "Social",
+                "Free WiFi"
+              ].map((tag, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`tag-${index}`}
+                    checked={selectedTags.includes(tag)}
+                    onCheckedChange={() => handleTagToggle(tag)}
+                  />
+                  <Label htmlFor={`tag-${index}`}>{tag}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Manners Dialog */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="hidden md:block w-full" variant="outline">
+              Study Manners ❤
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Manners and Advice</AlertDialogTitle>
+              <AlertDialogDescription>
+                The purpose of StudyAuckland is to enable an informative way to explore where best to work, study, and be productive in the greatest city in the world!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogDescription>
+              Support commercial business by purchasing food or drinks if staying long. Respect the space.
+            </AlertDialogDescription>
+            <AlertDialogDescription>
+              No space hoarding — it’s not your sidewalk.
+            </AlertDialogDescription>
+            <AlertDialogDescription>
+              Respect goes a long way ❤
+            </AlertDialogDescription>
+            <AlertDialogFooter>
+              <AlertDialogAction>Got it!</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {/* Main Content */}
       <div className="w-full md:w-3/5 flex flex-col overflow-hidden">
-        <div className="h-64 w-full border rounded-xl overflow-hidden shrink-0">
+        {/* Map */}
+        <div className="h-64 md:h-[300px] w-full border-b md:border-none">
           {isLoaded && (
             <GoogleMap
               mapContainerClassName="w-full h-full"
@@ -143,7 +156,7 @@ function App() {
           )}
         </div>
 
-        {/* Vibe Spot Cards */}
+        {/* Spot Cards */}
         <ScrollArea className="flex-1 overflow-y-auto">
           <div className="flex flex-col space-y-4 p-4">
             {filteredSpots.map((spot, index) => (
@@ -161,7 +174,7 @@ function App() {
         </ScrollArea>
       </div>
     </div>
-  );
+  )
 }
 
 export default App
