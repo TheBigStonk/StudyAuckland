@@ -12,6 +12,8 @@ type VibeSpotCardProps = {
   isActive?: boolean
   onHover?: () => void
   onLeave?: () => void
+  onClick?: () => void
+  isSelected?: boolean
 }
 
 export function VibeSpotCard({
@@ -21,9 +23,10 @@ export function VibeSpotCard({
   address,
   tags,
   wifiPassword,
-  isActive,
+  isSelected,
   onHover,
   onLeave,
+  onClick
 }: VibeSpotCardProps) {
   const [showPassword, setShowPassword] = useState(false)
 
@@ -32,11 +35,12 @@ export function VibeSpotCard({
       className="flex items-center justify-center"
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
+      onClick={onClick}
     >
       <Card
         className={`w-full p-3 border-2 ${
-          isActive ? "border-blue-500 shadow-md" : "border-transparent"
-        }`}
+          isSelected ? "border-blue-500 shadow-md" : "border-transparent"
+        } hover:cursor-pointer hover:scale-102`}
       >
         <CardHeader className="flex flex-row items-start gap-x-4 p-0">
           {/* Image */}
@@ -55,7 +59,10 @@ export function VibeSpotCard({
                   size="sm"
                   variant="secondary"
                   className="text-xs px-2 py-1"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={(e) => {
+                    e.stopPropagation() // Prevent card onClick
+                    setShowPassword(!showPassword)
+                  }}
                 >
                   {showPassword ? wifiPassword : "WiFi info"}
                 </Button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import logo from '/studyauckland-high-resolution-logo.png'
 import './App.css'
 import { Textarea } from "@/components/ui/textarea"
@@ -23,6 +23,7 @@ import mapStyle from "./style/MapStyle"
 
 function App() {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedSpotIndex, setSelectedSpotIndex] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const center = { lat: -36.856, lng: 174.762 }
 
@@ -49,6 +50,15 @@ function App() {
 
     return matchesTags && matchesSearch
   })
+
+  useEffect(() => {
+    if (
+      selectedSpotIndex !== null &&
+      (selectedSpotIndex < 0 || selectedSpotIndex >= filteredSpots.length)
+    ) {
+      setSelectedSpotIndex(null)
+    }
+  }, [filteredSpots, selectedSpotIndex])
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden">
@@ -146,10 +156,24 @@ function App() {
                 zoomControl: true,
               }}
             >
-              {filteredSpots.map((spot, index) => (
+              {selectedSpotIndex !== null && filteredSpots[selectedSpotIndex] ? (
+                <Marker
+                  key={selectedSpotIndex}
+                  position={{
+                    lat: filteredSpots[selectedSpotIndex].lat,
+                    lng: filteredSpots[selectedSpotIndex].lng,
+                  }}
+                  onClick={() => setSelectedSpotIndex(null)}
+                />
+              ) : filteredSpots.map((spot, index) => (
                 <Marker
                   key={index}
                   position={{ lat: spot.lat, lng: spot.lng }}
+                  onClick={() =>
+                    selectedSpotIndex === index
+                      ? setSelectedSpotIndex(null)
+                      : setSelectedSpotIndex(index)
+                  }
                 />
               ))}
             </GoogleMap>
@@ -159,7 +183,19 @@ function App() {
         {/* Spot Cards */}
         <ScrollArea className="flex-1 overflow-y-auto">
           <div className="flex flex-col space-y-4 p-4">
-            {filteredSpots.map((spot, index) => (
+            {selectedSpotIndex !== null && filteredSpots[selectedSpotIndex] ? (
+              <VibeSpotCard
+                key={selectedSpotIndex}
+                image={filteredSpots[selectedSpotIndex].image}
+                title={filteredSpots[selectedSpotIndex].title}
+                description={filteredSpots[selectedSpotIndex].description}
+                address={filteredSpots[selectedSpotIndex].address}
+                tags={filteredSpots[selectedSpotIndex].tags}
+                wifiPassword={filteredSpots[selectedSpotIndex].wifiPassword}
+                onClick={() => setSelectedSpotIndex(null)}
+                isSelected={true}
+              />
+            ) : filteredSpots.map((spot, index) => (
               <VibeSpotCard
                 key={index}
                 image={spot.image}
@@ -168,6 +204,12 @@ function App() {
                 address={spot.address}
                 tags={spot.tags}
                 wifiPassword={spot.wifiPassword}
+                onClick={() =>
+                  selectedSpotIndex === index
+                    ? setSelectedSpotIndex(null)
+                    : setSelectedSpotIndex(index)
+                }
+                isSelected={selectedSpotIndex === index}
               />
             ))}
           </div>
